@@ -51,6 +51,18 @@ try
         //У цьому коді він очікує інформації від клієнтів
         Socket client = server.Accept(); //Тут зупинка, поки хось не постуєкає
         Console.WriteLine($"До нас постукав {client.RemoteEndPoint}");
+        //Отримуємо від клієнта інформацію
+        int bytes = 0; //кількість байтів від клієнта
+        byte[] buffer = new byte[1024]; // сюди запишемо байти клієнта
+        do
+        {
+            bytes = client.Receive(buffer); //Отримуємо байти від клієнта
+            var str = Encoding.UTF8.GetString(buffer); // байти перетворив у рядок
+            Console.WriteLine($"Повідомлення: `{str}`");
+        } while (client.Available > 0); // якщо є що читати від клієнта
+        string msg = $"Дякую друже. {DateTime.Now}"; //Текст повідомлення для клієнта
+        buffer = Encoding.UTF8.GetBytes(msg); //Повідомлення для клієнта
+        client.Send(buffer); //відпраляю клієнту байти        
         client.Shutdown(SocketShutdown.Both);
         client.Close();
     }
