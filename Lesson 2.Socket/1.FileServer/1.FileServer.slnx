@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="1.FileServer/1.FileServer.csproj" />
+  <Project Path="2.UploadImageServerConsole/2.UploadImageServerConsole.csproj" />
 </Solution>
