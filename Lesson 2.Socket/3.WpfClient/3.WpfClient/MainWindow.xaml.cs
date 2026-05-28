@@ -55,7 +55,7 @@ namespace _3.WpfClient
             }
             try
             {
-                IPAddress ip = IPAddress.Parse("192.168.50.185");
+                IPAddress ip = IPAddress.Parse("3.126.91.162");
                 int port = 4789;
                 _message.UserId = Guid.NewGuid().ToString(); // унікальний Id
                 _message.Name = txtUserName.Text;
