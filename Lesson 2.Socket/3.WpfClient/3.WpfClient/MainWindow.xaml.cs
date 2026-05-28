@@ -59,6 +59,7 @@ namespace _3.WpfClient
                 int port = 4789;
                 _message.UserId = Guid.NewGuid().ToString(); // унікальний Id
                 _message.Name = txtUserName.Text;
+                _message.Photo = _imageUser;
                 _tcpClient.Connect(ip, port); //підключаємося до сервера
                 _ns = _tcpClient.GetStream(); //отримуємо потік
                 //в окремий потік кладемо відповіді від клієнта
@@ -118,7 +119,7 @@ namespace _3.WpfClient
                 {
                     ChatMessage msg = ChatMessage.Deserialize(bytes);
                     string text = $"{msg.Name} -> {msg.Text}";
-                    ViewMessage(text, "https://media.istockphoto.com/id/1759448630/photo/happy-caucasian-young-student-female-looking-at-camera-enjoying-with-a-perfect-white-teeth.jpg?s=612x612&w=0&k=20&c=KbfDI3FjAdGYK5QxTx3PJdxFyx9ZNgvOBd0P7E3Ah38=");
+                    ViewMessage(text, msg.Photo);
                 }));
             }
         }
@@ -137,6 +138,8 @@ namespace _3.WpfClient
 
         private void btnSend_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(txtText.Text.Trim()))
+                return;
             _message.Text = txtText.Text;
             var buffer = _message.Serialize();
             _ns.Write(buffer);
