@@ -8,6 +8,7 @@ public class ChatMessage
     public string UserId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Text { get; set; } = string.Empty;
+    public string Photo { get; set; } = string.Empty;
 
     //Можна Serialize та Desserialize
     public byte[] Serialize()
