@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json;
+using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows;
@@ -13,6 +16,11 @@ using System.Windows.Shapes;
 
 namespace _3.WpfClient
 {
+
+    public class UploadImage
+    {
+        public string Image { get; set; } = String.Empty;
+    }
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -25,6 +33,9 @@ namespace _3.WpfClient
         //Потік для відправки повідомлень
         private NetworkStream _ns;
         private Thread _thread; //робочий потік
+        //якщо користувач обрав фото, то воно не буде пустим
+        private string _imageUser = String.Empty;
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -32,7 +43,12 @@ namespace _3.WpfClient
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            if(string.IsNullOrEmpty(txtUserName.Text))
+            if(string.IsNullOrEmpty(_imageUser))
+            {
+                MessageBox.Show("Оберіть фото користувача");
+                return;
+            }
+            else if(string.IsNullOrEmpty(txtUserName.Text))
             {
                 MessageBox.Show("Вкажіть ім'я користувача");
                 return;
@@ -126,6 +142,54 @@ namespace _3.WpfClient
             _ns.Write(buffer);
 
             txtText.Text = "";
+        }
+
+        //користувач буде обирати фото, для цього ми фото
+        //будемо завантажувати на глобальний сервер
+        //cheburek.itstep.click
+        private void btnPhotoSelect_Click(object sender, RoutedEventArgs e)
+        { 
+            OpenFileDialog dlg = new OpenFileDialog();
+            if(dlg.ShowDialog().Value)
+            {
+                //MessageBox.Show("Select file", dlg.FileName);
+                //Потрібно файл завантажити на сервер для зберігання.
+                //Щоб він був доступний глобально
+                //перетворюємо файл у байти
+                var bytes = File.ReadAllBytes(dlg.FileName);
+                var base64 = Convert.ToBase64String(bytes); //для передачі на сервер
+                string json = JsonConvert.SerializeObject(new
+                {
+                    photo = base64,
+                });
+                bytes = Encoding.UTF8.GetBytes(json);
+                string server = "https://cheburek.itstep.click";
+                //За допомогою WebRequest - передама фото на сервер для зберігання
+                WebRequest request = 
+                    WebRequest.Create($"{server}/api/galleries/upload");
+                request.Method = "POST";
+                request.ContentType = "application/json";
+                //Запишемо байти у потік
+                using (var stream = request.GetRequestStream())
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                }
+                try
+                {
+                    var resp = request.GetResponse(); //відпраляємо фото на севрвер
+                    using (var stream = new StreamReader(resp.GetResponseStream()))
+                    {
+                        string data = stream.ReadToEnd();
+                        var objectServer = JsonConvert.DeserializeObject<UploadImage>(data);
+                        //MessageBox.Show($"{server}{objectServer.Image}");
+                        _imageUser = $"{server}{objectServer.Image}";
+                    }
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
     }
 }

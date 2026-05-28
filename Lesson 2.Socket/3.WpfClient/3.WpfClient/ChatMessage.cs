@@ -18,6 +18,7 @@ public class ChatMessage
         writer.Write(UserId);
         writer.Write(Name);
         writer.Write(Text);
+        writer.Write(Photo);
         return m.ToArray(); //повертаємо масив byte
     }
     public static ChatMessage Deserialize(byte[] data)
@@ -28,6 +29,7 @@ public class ChatMessage
         msg.UserId = reader.ReadString();
         msg.Name = reader.ReadString();
         msg.Text = reader.ReadString();
+        msg.Photo = reader.ReadString();
         return msg;
     }
 

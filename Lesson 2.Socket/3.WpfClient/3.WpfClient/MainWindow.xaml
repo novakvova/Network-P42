@@ -52,7 +52,7 @@
         <Button x:Name="btnPhotoSelect" 
                 Width="130" Height="40" 
                 Margin="425,-95,0,0" 
-                FontSize="13">Вибрати фото...</Button>
+                FontSize="13" Click="btnPhotoSelect_Click">Вибрати фото...</Button>
 
         <Label Content="Ім'я" 
                HorizontalAlignment="Left" 
